@@ -1,0 +1,44 @@
+buildscript {
+    repositories {
+        maven { url = "https://repo.starfarm.fun/public" }
+        maven {
+            url = "https://repo.starfarm.fun/private"
+            credentials {
+                username System.getenv("SF_REPO_USER")
+                password System.getenv("SF_REPO_PASSWORD")
+            }
+        }
+    }
+
+    dependencies {
+        classpath "ru.starfarm:plugin-bundler:1.0.3"
+    }
+}
+
+plugins {
+    id "java"
+}
+
+apply plugin: "ru.starfarm.plugin-bundler"
+
+group = "ru.starfarm"
+version = "1.0.0"
+
+corePlugin {
+    //main = "ru.starfarm.teplateplugin.TemplatePlugin
+    //name = "Template"
+    //В нашем случае main и name можно не указывать, т.к бандлер сам найдет класс если он наследует JavaPlugin\CorePlugin
+    //Так же название плагина он определит по названию класса заменив в нем ключевые слова: "Plugin"
+    author = "dargen"
+    version = project.version
+}
+
+repositories.addAll(buildscript.repositories)
+
+dependencies {
+    compileOnly "ru.starfarm:core:live" //Если вы пишете на kotlin используйте live-kt
+    compileOnly "com.comphenix:protocol-lib:4.5.0"
+    compileOnly "org.spigotmc:spigot:1.12.2-R0.1-SNAPSHOT"
+}
+
+tasks.withType(JavaCompile)*.options*.encoding = "UTF-8"
