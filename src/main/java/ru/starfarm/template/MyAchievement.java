@@ -36,13 +36,6 @@ public enum MyAchievement implements CoreAchievement {
         return name;
     }
 
-    //ID достижения, в системе
-    @NotNull
-    @Override
-    public String getId() {
-        return name();
-    }
-
     //Секция достижения, ставится в зависимости от режима (PRISON, SKYBLOCK, SKYWARS) КАПСОМ!!
     @NotNull
     @Override

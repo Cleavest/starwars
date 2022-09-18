@@ -1,6 +1,9 @@
 package ru.starfarm.template;
 
+import net.minecraft.server.v1_12_R1.EntityLiving;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -28,6 +31,17 @@ public class TemplatePlugin extends CorePlugin {
         //Класс слушателя не обязан реализовывать Listener
         getEventContext().onListeners(new TemplateListener());
 
+        //Использование тасков
+        //Вызовет выполнение таска через 20 тиков, так же есть afterAsync , выполнит то же, но асинхронно
+        getTaskContext().after(20 /*тики*/, task -> {
+            Bukkit.getWorlds().get(0).getEntities().forEach(Entity::remove);
+        });
+        EntityLiving entity = (EntityLiving) Bukkit.getWorlds().get(0).getEntities().stream().findFirst().get();
+        //Вызывает выполнение таска через 10 тиков, каждые 20 тиков, так же есть everyAsync, 3 параметр числа не обязателен
+        getTaskContext().every(10, 20, 20 /*кол-во повторений (не обязательно)*/, task -> {
+            entity.heal(2);
+        }).setOnTerminate(task -> entity.killEntity()); //Функция по окончанию таска, не обязательная
+
         //Регистрация анотированной команды
         //Сервис пройдется по всем классам в указанном пакете и зарегистрирует анотированные
         registerBaseCommands("ru.starfarm.template.command");
@@ -37,11 +51,9 @@ public class TemplatePlugin extends CorePlugin {
 
     @Override
     public void handleTowerConnect() {
-        //Регистрация своих атчивок
-        ApiManager.appendAchievements(
-                //В секции указываем id, ОБЯЗАТЕЛЬНО должен совпадать с id в классе атчивок (КАПСОМ), имя секции (режима) и иконку
-                new AchievementSection("MY", "§aМой режим", Material.DIAMOND_SWORD),
-                MyAchievement.class
-        );
+        //Регистрация своих атчивок, с указанием названием секции и иконки
+        ApiManager.appendAchievements("§aМой режим", Material.DIAMOND_SWORD, MyAchievement.class);
+        //Регистрация своих донат возможностей
+        ApiManager.appendDonateAbilities("§aМой режим", Material.DIAMOND_SWORD, MyDonateAbility.class);
     }
 }
